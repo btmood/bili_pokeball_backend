@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: pokeball_spider     # 服务名
+  profiles:
+    active: dev    # 环境设置：dev、prod、test
+
+logging:
+  config: classpath:log4j2-dev.xml
