@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -104,10 +105,28 @@ public class DownloadImpl implements IDownload,Runnable {
             }
             //弹出一个url
             String url = urlBlockingQueue.poll();
+            if (StringUtils.isEmpty(url)) {
+                log.error("从redis获取的下载url为空");
+                continue;
+            }
             String[] split = url.split(";");
             String UrlUserInfo = split[0];
             String urlRelation = split[1];
             String urlUpStat = split[2];
+
+            //这边不可能为空
+//            if (StringUtils.isEmpty(UrlUserInfo)) {
+//                log.error("UrlUserInfo为空");
+//                continue;
+//            }
+//            if (StringUtils.isEmpty(urlRelation)) {
+//                log.error("urlRelationw为空");
+//                continue;
+//            }
+//            if (StringUtils.isEmpty(urlUpStat)) {
+//                log.error("urlUpStat为空");
+//                continue;
+//            }
 
             //relation包含当前用户粉丝数
             //策略：粉丝数小于10w的就放弃，后面的url就不请求了
@@ -119,6 +138,10 @@ public class DownloadImpl implements IDownload,Runnable {
 //                continue;
 //            }
             String userInfo = HttpClientTool.doGet(UrlUserInfo, null);
+            if (StringUtils.isEmpty(userInfo)){
+                log.error("没有下载下来东西{}",userInfo);
+                continue;
+            }
             //防止userinfo里的用户签名包含特殊字符
             userInfo = userInfo.replaceAll(";", "");
             String upStat = HttpClientTool.doGet(urlUpStat, null);

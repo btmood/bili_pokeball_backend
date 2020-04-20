@@ -87,4 +87,14 @@ public class Test01 {
         System.out.println(substring);
     }
 
+    @Test
+    public void test06(){
+        String s = "1233sdf";
+        String s1 = s.replaceAll(";", "");
+        System.out.println(s1);
+
+    }
+
+
+
 }

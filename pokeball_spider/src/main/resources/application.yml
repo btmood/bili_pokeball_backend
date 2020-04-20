@@ -6,3 +6,7 @@ spring:
 
 logging:
   config: classpath:log4j2-dev.xml
+
+
+biliUrl:
+  onlinePeople: https://api.bilibili.com/x/web-interface/online

@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.BlockingQueue;
 
+/**
+ * 动态生成userAPI
+ */
 @Component("userRepository")
 @Scope("prototype")
 @Data

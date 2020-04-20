@@ -4,6 +4,7 @@ import com.lark.spider.core.repository.impl.UserRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -39,6 +40,13 @@ public class RedisTest01 {
             System.out.println(queue.size());
             System.out.println("==================================================");
         }
+    }
+
+    @Value("${biliUrl.onlinePeople}")
+    private String onlinePeople;
+    @Test
+    public void test03(){
+        System.out.println(onlinePeople);
 
     }
 

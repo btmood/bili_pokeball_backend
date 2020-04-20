@@ -139,12 +139,14 @@ public class DownloadTest01 {
         Thread downloadThread3 = new Thread(downloadImpl);
         Thread downloadThread4 = new Thread(downloadImpl);
         Thread downloadThread5 = new Thread(downloadImpl);
+        Thread downloadThread6 = new Thread(downloadImpl);
 
         downloadThread1.start();
         downloadThread2.start();
         downloadThread3.start();
         downloadThread4.start();
         downloadThread5.start();
+        downloadThread6.start();
 
 
         /*解析器开始*/
