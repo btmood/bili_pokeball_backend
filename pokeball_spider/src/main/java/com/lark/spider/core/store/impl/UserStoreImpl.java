@@ -79,7 +79,7 @@ public class UserStoreImpl implements IUserStore,Runnable {
     public void run() {
         while (true) {
             while (userInfoQueue.size() < 50) {
-                log.info("userInfoQueue队列包含对象小于400，等待解析器解析中......");
+                log.error("userInfoQueue队列包含对象小于50，等待解析器解析中......");
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
@@ -88,6 +88,7 @@ public class UserStoreImpl implements IUserStore,Runnable {
             }
 
             //把队列中的所有数据全部传到list中
+            //这里转成list虽然可能两个list会不同步，但是没关系，下一波照样插入
             int i = userStatQueue.drainTo(userStatList);
             userInfoQueue.drainTo(userInfoList);
             log.info("本次将要插入数据库" + i + "条数据");

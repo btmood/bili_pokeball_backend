@@ -37,15 +37,15 @@ public class ISpider {
         return this.download.downloadJson(url);
     }
 
-    public void parseUserInfo(String content, UserInfo userInfo){
+    public void parseUserInfo(String content, UserInfo userInfo) throws Exception {
         this.parser.parseUserInfo(content,userInfo);
     }
 
-    public void parseRelation(String content, UserStat userStat){
+    public void parseRelation(String content, UserStat userStat) throws Exception {
         this.parser.parseRelation(content, userStat);
     }
 
-    public void parseUpStat(String content, UserStat userStat){
+    public void parseUpStat(String content, UserStat userStat) throws Exception {
         this.parser.parseUpStat(content, userStat);
     }
 

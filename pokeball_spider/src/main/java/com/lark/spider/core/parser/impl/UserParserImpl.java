@@ -40,10 +40,15 @@ public class UserParserImpl implements IUserParser,Runnable {
 
 
     @Override
-    public void parseUserInfo(String content, UserInfo userInfo) throws NullPointerException {
+    public void parseUserInfo(String content, UserInfo userInfo) throws Exception {
         JSONObject root = new JSONObject().parseObject(content);
 
         String code = root.getString("code");
+        //返回的不是0说明解析有问题
+        if (!code.equals(0)) {
+            log.error("解析失败，返回的状态码错误{}",code);
+            throw new Exception("解析失败");
+        }
         String data = root.getString("data");
 
         JSONObject dataJson = new JSONObject().parseObject(data);
@@ -81,8 +86,15 @@ public class UserParserImpl implements IUserParser,Runnable {
     }
 
     @Override
-    public void parseRelation(String content, UserStat userStat) throws NullPointerException {
+    public void parseRelation(String content, UserStat userStat) throws Exception {
         JSONObject root = new JSONObject().parseObject(content);
+
+        String code = root.getString("code");
+        //返回的不是0说明解析有问题
+        if (!code.equals(0)) {
+            log.error("解析失败，返回的状态码错误{}",code);
+            throw new Exception("解析失败");
+        }
 
         String data = root.getString("data");
 
@@ -96,8 +108,15 @@ public class UserParserImpl implements IUserParser,Runnable {
     }
 
     @Override
-    public void parseUpStat(String content, UserStat userStat) throws NullPointerException {
+    public void parseUpStat(String content, UserStat userStat) throws Exception {
         JSONObject root = new JSONObject().parseObject(content);
+
+        String code = root.getString("code");
+        //返回的不是0说明解析有问题
+        if (!code.equals(0)) {
+            log.error("解析失败，返回的状态码错误{}",code);
+            throw new Exception("解析失败");
+        }
 
         String data = root.getString("data");
 
@@ -119,7 +138,7 @@ public class UserParserImpl implements IUserParser,Runnable {
     public void run() {
         while (true) {
             while (userInfoQueue.size() >= 800) {
-                log.info("userInfoList队列中数据超过800条，暂停解析");
+                log.error("userInfoList队列中数据超过800条，暂停解析");
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
@@ -128,14 +147,13 @@ public class UserParserImpl implements IUserParser,Runnable {
             }
 
             while (JSONContentQueue.size() <= 5) {
-                log.info("JSONContentQueue数据少于5条，等待下载器下载内容......");
+                log.error("JSONContentQueue数据少于5条，暂停解析，等待下载器下载内容......");
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
-            System.out.println("开始解析了！！！");
 
             String JSONContent = JSONContentQueue.poll();
 
@@ -156,9 +174,9 @@ public class UserParserImpl implements IUserParser,Runnable {
                 userStat.setUid(uid);
                 parseRelation(relationJSON, userStat);
                 parseUpStat(upStatJSON, userStat);
-            } catch (NullPointerException e) {
+            } catch (Exception e) {
                 //TODO
-                log.error("该用户不存在，无法解析，返回的JSON内容为：" + JSONContent);
+                log.error("解析失败，错误信息：{0}；返回的JSON内容为：{1}",2,JSONContent);
                 continue;
             }
 

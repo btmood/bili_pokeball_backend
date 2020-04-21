@@ -75,7 +75,7 @@ public class DownloadImpl implements IDownload,Runnable {
         userInfo = userInfo.replaceAll(";", "");
         String upStat = HttpClientTool.doGet(urlUpStat, null);
 
-        //把用户相关的所有content凭借在一起返回
+        //把用户相关的所有content拼接在一起返回
         String allJson = upStat + ";" + relation + ";" + userInfo;
 
         JSONContentQueue.add(allJson);
@@ -88,7 +88,7 @@ public class DownloadImpl implements IDownload,Runnable {
         while (true) {
             log.info("下载器的" + Thread.currentThread().getName() + "正在执行");
             while (urlBlockingQueue.size() <= 5) {
-                log.info("urlBlockingQueue队列中url少于5个，等待url填充中......");
+                log.error("urlBlockingQueue队列中url少于5个，等待url填充中......");
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {
@@ -114,37 +114,31 @@ public class DownloadImpl implements IDownload,Runnable {
             String urlRelation = split[1];
             String urlUpStat = split[2];
 
-            //这边不可能为空
-//            if (StringUtils.isEmpty(UrlUserInfo)) {
-//                log.error("UrlUserInfo为空");
-//                continue;
-//            }
-//            if (StringUtils.isEmpty(urlRelation)) {
-//                log.error("urlRelationw为空");
-//                continue;
-//            }
-//            if (StringUtils.isEmpty(urlUpStat)) {
-//                log.error("urlUpStat为空");
-//                continue;
-//            }
-
             //relation包含当前用户粉丝数
             //策略：粉丝数小于10w的就放弃，后面的url就不请求了
             String relation = HttpClientTool.doGet(urlRelation, null);
+            if (StringUtils.isEmpty(relation)) {
+                log.error("relation下载失败{}",relation);
+                continue;
+            }
             Boolean fansMoreThan10000 = this.isFansMoreThan10000(relation);
             //如果用户粉丝数小于10w，那么直接返回空
-//            if (fansMoreThan10000 == false) {
-//                log.info("当前用户粉丝数小于10w，取消爬取相关信息");
-//                continue;
-//            }
+            if (fansMoreThan10000 == false) {
+                log.debug("当前用户粉丝数小于10w，取消爬取相关信息");
+                continue;
+            }
             String userInfo = HttpClientTool.doGet(UrlUserInfo, null);
             if (StringUtils.isEmpty(userInfo)){
-                log.error("没有下载下来东西{}",userInfo);
+                log.error("userInfo下载失败{}",userInfo);
                 continue;
             }
             //防止userinfo里的用户签名包含特殊字符
             userInfo = userInfo.replaceAll(";", "");
             String upStat = HttpClientTool.doGet(urlUpStat, null);
+            if (StringUtils.isEmpty(userInfo)){
+                log.error("upStat下载失败{}",upStat);
+                continue;
+            }
 
             //把爬取下来的所有json，拼接在一起返回
             String allJson = upStat + ";" + relation + ";" + userInfo;

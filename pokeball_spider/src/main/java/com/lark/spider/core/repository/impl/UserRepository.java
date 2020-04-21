@@ -139,7 +139,8 @@ public class UserRepository implements Runnable {
             this.userBlockingQueue.add(allUrl);
             //检测一下队列里的数据有没有超过60，超过60就让线程休眠
             while (true) {
-                if (this.userBlockingQueue.size() <= 60) {
+                if (this.userBlockingQueue.size() <= 1000) {
+                    log.error("用户url队列中url大于1000个");
                     break;
                 }
                 try {
@@ -148,9 +149,6 @@ public class UserRepository implements Runnable {
                     e.printStackTrace();
                 }
             }
-            System.out.println("=====" + userBlockingQueue.size());
-//            System.out.println("=====" + userBlockingQueue);
-
         }
 
     }

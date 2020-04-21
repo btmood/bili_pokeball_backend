@@ -82,7 +82,7 @@ public class StartSpider {
     long i = 1;
 
     @Scheduled(cron = "0 35 12  * * ?")
-    public void test03(){
+    public void test03() throws Exception {
         iSpider.setDownload(userDownload);
         iSpider.setParser(userParser);
         iSpider.setStore(userStore);

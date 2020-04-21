@@ -77,13 +77,15 @@ public class HttpClientTool {
                 url += "?" + EntityUtils.toString(new UrlEncodedFormEntity(pairs, charset));
             }
             HttpGet httpGet = new HttpGet(url);
-            httpGet.setHeader("User_Agent", "PostmanRuntime/7.22.0");
+            httpGet.setHeader("User_Agent", AntiSpider.getOneUserAgent());
             httpGet.setHeader("Referer", "https://www.bilibili.com/");
-            httpGet.setHeader("Accept-Encoding", "Accept-Encoding");
+            httpGet.setHeader("Accept-Encoding", "gzip, deflate, br");
             httpGet.setHeader("Content-Type","text/html; charset=utf-8");
             httpGet.setHeader("Accept-Language", "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2");
             httpGet.setHeader("Connection", "keep-alive");
             httpGet.setHeader("Cache-Control", "no-cache");
+            httpGet.setHeader("Pragma", "no-cache");
+            httpGet.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
             httpGet.setHeader("Cookie", "CURRENT_FNVAL=16; _uuid=CC7CBE95-C041-4C8C-7245-3C4E1A4152A733010infoc; buvid3=00AE0D62-E13B-4F7F-BB6F-E1E744837EA6155834infoc; LIVE_BUVID=AUTO3415763667359134; stardustvideo=1; laboratory=1-1; rpdid=|(umk~YkkRlJ0J'ul)kJllkRJ; INTVER=1; sid=51o3kld0");
             System.out.println(httpGet);
             CloseableHttpResponse response = httpClient.execute(httpGet);
