@@ -9,4 +9,8 @@ logging:
 
 
 biliUrl:
-  onlinePeople: https://api.bilibili.com/x/web-interface/online
+  user:
+    onlinePeopleURL: https://api.bilibili.com/x/web-interface/online #当前全网在线人数
+    baseUserInfoURL: https://api.bilibili.com/x/space/acc/info?mid= #用户基本信息
+    baseRelationURL: http://api.bilibili.com/x/relation/stat?vmid= #粉丝数、关注别人数
+    baseUpStatURL: https://api.bilibili.com/x/space/upstat?mid= #播放量、被点赞数

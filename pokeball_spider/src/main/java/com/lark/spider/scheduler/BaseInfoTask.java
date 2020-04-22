@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class BaseInfoTask {
 
-    @Value("${biliUrl.onlinePeople}")
+    @Value("${biliUrl.user.onlinePeopleURL}")
     private String onlinePeople;
 
     @Autowired
