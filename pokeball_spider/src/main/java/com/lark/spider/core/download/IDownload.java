@@ -18,4 +18,11 @@ public interface IDownload {
      */
     public String downloadJson(BlockingQueue<String> blockingQueue);
 
+    /**
+     * 下载html页面
+     * @param Url
+     * @return
+     */
+    public String downloadHtml(String Url);
+
 }

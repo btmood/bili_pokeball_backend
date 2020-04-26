@@ -25,7 +25,10 @@ public class RedisTest01 {
 //        String count = (String) redisTemplate.opsForValue().get("count").toString();
 
 //        System.out.println("查到的count是：" + count);
-        redisTemplate.opsForValue().set("spider.state", 1);
+//        redisTemplate.opsForValue().set("spider.state", 1);
+//        redisTemplate.opsForSet().add("proxy", "113.208.115.190:8118");
+        redisTemplate.opsForSet().add("bili:video:rank:avscore", "1");
+        redisTemplate.opsForSet().add("bili:user:rank:uid","1");
     }
 
     @Autowired
@@ -42,7 +45,7 @@ public class RedisTest01 {
         }
     }
 
-    @Value("${biliUrl.onlinePeople}")
+    @Value("${biliUrl.user.onlinePeopleURL}")
     private String onlinePeople;
     @Test
     public void test03(){

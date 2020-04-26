@@ -18,18 +18,18 @@ public class IPProxy {
 
     int i = 0;
 
-    @Scheduled(cron = "*/1 * * * * ?")
-    public void test1(){
-//        System.out.println("插入");
-        redisTemplate.opsForSet().add("test", i++);
-        System.out.println("插入" + Thread.currentThread().getName());
-    }
-
-    @Scheduled(cron = "*/6 * * * * ?")
-    public void test2(){
-        Set<Object> test = redisTemplate.opsForSet().members("test");
-        System.out.println(test);
-        System.out.println("获取" + Thread.currentThread().getName());
-    }
+//    @Scheduled(cron = "*/1 * * * * ?")
+//    public void test1(){
+////        System.out.println("插入");
+//        redisTemplate.opsForSet().add("test", i++);
+//        System.out.println("插入" + Thread.currentThread().getName());
+//    }
+//
+//    @Scheduled(cron = "*/6 * * * * ?")
+//    public void test2(){
+//        Set<Object> test = redisTemplate.opsForSet().members("test");
+//        System.out.println(test);
+//        System.out.println("获取" + Thread.currentThread().getName());
+//    }
 
 }

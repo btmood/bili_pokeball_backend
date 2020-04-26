@@ -12,6 +12,7 @@
         <module>pokeball_spider</module>
         <module>pokeball_webcommon</module>
         <module>pokeball_userservice</module>
+        <module>statservice</module>
     </modules>
     <parent>
         <groupId>org.springframework.boot</groupId>

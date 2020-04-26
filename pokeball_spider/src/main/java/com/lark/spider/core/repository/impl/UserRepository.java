@@ -32,6 +32,7 @@ public class UserRepository implements Runnable {
      * 产生用户信息相关api
      * @param blockingQueue 用于保存api的队列
      */
+    @Deprecated
     public void getBiliUserIdNow(BlockingQueue<String> blockingQueue) {
 
         this.userBlockingQueue = blockingQueue;
@@ -91,14 +92,13 @@ public class UserRepository implements Runnable {
      * 本地生成用户id，加了同步锁，防止多线程出问题
      * @return
      */
+    @Deprecated
     private synchronized int getBiliUserIdNowAuto(){
         return i++;
     }
 
     /**
      * 从redis获取当前用户id
-     * 但是效率太低了
-     * 所以直接本地生成了
      * @return
      */
     private Long getBiliUserIdNowByRedis(){

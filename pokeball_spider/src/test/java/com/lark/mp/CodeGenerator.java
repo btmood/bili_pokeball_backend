@@ -37,12 +37,12 @@ public class CodeGenerator {
         gc.setSwagger2(false);//开启Swagger2模式
 
         /*自定义文件名*/
-        gc.setControllerName("UserStatController");
-        gc.setServiceName("UserStatService");
-        gc.setServiceImplName("UserStatServiceImpl");
-        gc.setMapperName("UserStatMapper");
-        gc.setXmlName("UserStatMapper");
-        gc.setEntityName("UserStat");
+        gc.setControllerName("PopularUserStatController");
+        gc.setServiceName("PopularUserStatService");
+        gc.setServiceImplName("PopularUserStatServiceImpl");
+        gc.setMapperName("PopularUserStatMapper");
+        gc.setXmlName("PopularUserStatMapper");
+        gc.setEntityName("PopularUserStat");
 
         mpg.setGlobalConfig(gc);
 
@@ -58,17 +58,17 @@ public class CodeGenerator {
         // 4、包配置
         PackageConfig pc = new PackageConfig();
 //        pc.setModuleName("eduservice"); //模块名
-        pc.setParent("com.lark.spider.core.pojo");
+        pc.setParent("com.lark.spider.spiderservice");
 
-//        pc.setController("controller");
+        pc.setController("controller");
         pc.setEntity("entity");
-//        pc.setService("service");
-//        pc.setMapper("mapper");
+        pc.setService("service");
+        pc.setMapper("mapper");
         mpg.setPackageInfo(pc);
 
         // 5、策略配置
         StrategyConfig strategy = new StrategyConfig();
-        strategy.setInclude("spider_user_stat");
+        strategy.setInclude("spider_user_popular_stat");
 
         strategy.setNaming(NamingStrategy.underline_to_camel);//数据库表映射到实体的命名策略
         strategy.setTablePrefix(pc.getModuleName() + "_"); //生成实体时去掉表前缀

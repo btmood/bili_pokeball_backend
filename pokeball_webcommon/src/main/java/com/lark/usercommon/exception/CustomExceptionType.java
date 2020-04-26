@@ -9,7 +9,8 @@ public enum CustomExceptionType {
     SERVER_ERROR(99999,"抱歉，系统繁忙，请稍后重试"),
 
     //用户操作2xxxx
-    MOBILEORPASSWORDERROR(20001, "用户名或密码错误");
+    MOBILEORPASSWORDERROR(20001, "用户名或密码错误"),
+    REQUESTARGUMENTSERROR(20002, "请求参数错误");
     //权限操作3xxxx
     //其它操作4xxxx
 

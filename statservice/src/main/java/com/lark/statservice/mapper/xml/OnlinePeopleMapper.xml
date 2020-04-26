@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lark.statservice.mapper.OnlinePeopleMapper">
+
+    <select id="selectOnlinePeopleBatch" resultType="com.lark.statservice.pojo.OnlinePeople">
+        SELECT *
+        FROM spider_base_stat
+        WHERE create_time &lt;= (
+                    SELECT MAX(create_time)
+                    FROM spider_base_stat
+                    WHERE create_time LIKE concat('%',#{queryTime},'%'))
+        ORDER BY create_time DESC
+        LIMIT 20
+    </select>
+</mapper>

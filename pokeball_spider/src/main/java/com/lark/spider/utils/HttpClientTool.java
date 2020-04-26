@@ -1,6 +1,11 @@
 package com.lark.spider.utils;
 
-import org.apache.commons.lang3.StringUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpHost;
+import org.apache.http.conn.HttpHostConnectException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
@@ -17,8 +22,11 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.TrustStrategy;
 import org.apache.http.util.EntityUtils;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -32,14 +40,19 @@ import javax.net.ssl.SSLContext;
 /**
  * 页面下载工具类
  */
+@Component
+@Slf4j
 public class HttpClientTool {
-    private static final CloseableHttpClient httpClient;
+//    private static final CloseableHttpClient httpClient;
     public static final String CHARSET = "UTF-8";
+    private static RedisTemplate redisTemplate = ApplicationContextProvider.getBean("redisTemplate", RedisTemplate.class);
     // 采用静态代码块，初始化超时时间配置，再根据配置生成默认httpClient对象
-    static {
-        RequestConfig config = RequestConfig.custom().setConnectTimeout(60000).setSocketTimeout(15000).build();
-        httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
-    }
+//    static {
+//        RequestConfig config = HttpClientTool.getRequestConfig();
+//        httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
+//    }
+
+
 
     public static String doGet(String url, Map<String, String> params) {
         return doGet(url, params, CHARSET);
@@ -61,10 +74,17 @@ public class HttpClientTool {
      * @return 页面内容
      */
     public static String doGet(String url, Map<String, String> params, String charset) {
-        if (StringUtils.isBlank(url)) {
+        if (StringUtils.isEmpty(url)) {
+            System.out.println("url为空？");
             return null;
         }
-        try {
+        System.out.println("111");
+        //从key为proxy的redis的set集合中随机取一个ip:port
+        String ip_port = (String) redisTemplate.opsForSet().randomMember("proxy");
+        RequestConfig config = HttpClientTool.getRequestConfig(ip_port);
+        //创建httpClient对象
+        CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
+//        try {
             if (params != null && !params.isEmpty()) {
                 List<NameValuePair> pairs = new ArrayList<NameValuePair>(params.size());
                 for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -74,22 +94,40 @@ public class HttpClientTool {
                     }
                 }
                 // 将请求参数和url进行拼接
-                url += "?" + EntityUtils.toString(new UrlEncodedFormEntity(pairs, charset));
+                try {
+                    url += "?" + EntityUtils.toString(new UrlEncodedFormEntity(pairs, charset));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
             HttpGet httpGet = new HttpGet(url);
-            httpGet.setHeader("User_Agent", AntiSpider.getOneUserAgent());
-            httpGet.setHeader("Referer", "https://www.bilibili.com/");
-            httpGet.setHeader("Accept-Encoding", "gzip, deflate, br");
-            httpGet.setHeader("Content-Type","text/html; charset=utf-8");
-            httpGet.setHeader("Accept-Language", "zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2");
-            httpGet.setHeader("Connection", "keep-alive");
-            httpGet.setHeader("Cache-Control", "no-cache");
-            httpGet.setHeader("Pragma", "no-cache");
-            httpGet.setHeader("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
-            httpGet.setHeader("Cookie", "CURRENT_FNVAL=16; _uuid=CC7CBE95-C041-4C8C-7245-3C4E1A4152A733010infoc; buvid3=00AE0D62-E13B-4F7F-BB6F-E1E744837EA6155834infoc; LIVE_BUVID=AUTO3415763667359134; stardustvideo=1; laboratory=1-1; rpdid=|(umk~YkkRlJ0J'ul)kJllkRJ; INTVER=1; sid=51o3kld0");
+            Map<String, String> headers = AntiSpider.getHeaders();
+            httpGet.setHeader("User-Agent", headers.get("User-Agent"));
+            httpGet.setHeader("Accept", headers.get("Accept"));
+            httpGet.setHeader("Accept-Language", headers.get("Accept-Language"));
+            httpGet.setHeader("Connection", headers.get("Connection"));
+            httpGet.setHeader("Accept-Encoding", headers.get("Accept-Encoding"));
+            httpGet.setHeader("Connection","keep-alive");
+            httpGet.setHeader("Host","api.bilibili.com");
+            httpGet.setHeader("Pragma","no-cache");
+            httpGet.setHeader("TE","Trailers");
+            httpGet.setHeader("Upgrade-Insecure-Requests","1");
             System.out.println(httpGet);
-            CloseableHttpResponse response = httpClient.execute(httpGet);
-            System.out.println(response);
+            //发起请求
+        CloseableHttpResponse response = null;
+        try {
+                response = httpClient.execute(httpGet);
+        } catch (SocketException e) {
+            //如果当前ip不可用就直接从redis仓库里删除
+            redisTemplate.opsForSet().remove("proxy", ip_port);
+            //相关url重新进入待爬取队列
+            //TODO
+            log.error("ip代理无法连接，ip是{}，错误信息是{}",ip_port,e);
+            return null;
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println(response);
             int statusCode = response.getStatusLine().getStatusCode();
             System.out.println(statusCode);
             if (statusCode != 200) {
@@ -99,12 +137,17 @@ public class HttpClientTool {
             HttpEntity entity = response.getEntity();
             String result = null;
             if (entity != null) {
-                result = EntityUtils.toString(entity, "utf-8");
+                try {
+                    result = EntityUtils.toString(entity, "utf-8");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+        try {
             EntityUtils.consume(entity);
             response.close();
             return result;
-        } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return null;
@@ -120,9 +163,13 @@ public class HttpClientTool {
      */
     public static String doPost(String url, Map<String, String> params, String charset)
             throws IOException {
-        if (StringUtils.isBlank(url)) {
+        if (StringUtils.isEmpty(url)) {
             return null;
         }
+        //从key为proxy的redis的set集合中随机取一个ip:port
+        String ip_port = (String) redisTemplate.opsForSet().randomMember("proxy");
+        RequestConfig config = HttpClientTool.getRequestConfig(ip_port);
+        CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
         List<NameValuePair> pairs = null;
         if (params != null && !params.isEmpty()) {
             pairs = new ArrayList<NameValuePair>(params.size());
@@ -134,6 +181,12 @@ public class HttpClientTool {
             }
         }
         HttpPost httpPost = new HttpPost(url);
+        Map<String, String> headers = AntiSpider.getHeaders();
+        httpPost.setHeader("User-Agent", headers.get("User-Agent"));
+        httpPost.setHeader("Accept", headers.get("Accept"));
+        httpPost.setHeader("Accept-Language", headers.get("Accept-Language"));
+        httpPost.setHeader("Connection", headers.get("Connection"));
+        httpPost.setHeader("Accept-Encoding", headers.get("Accept-Encoding"));
         if (pairs != null && pairs.size() > 0) {
             httpPost.setEntity(new UrlEncodedFormEntity(pairs, CHARSET));
         }
@@ -169,9 +222,12 @@ public class HttpClientTool {
      * @return 页面内容
      */
     public static String doGetSSL(String url, Map<String, String> params, String charset) {
-        if (StringUtils.isBlank(url)) {
+        if (StringUtils.isEmpty(url)) {
             return null;
         }
+        String ip_port = (String) redisTemplate.opsForSet().randomMember("proxy");
+        RequestConfig config = HttpClientTool.getRequestConfig(ip_port);
+        CloseableHttpClient httpClient = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
         try {
             if (params != null && !params.isEmpty()) {
                 List<NameValuePair> pairs = new ArrayList<NameValuePair>(params.size());
@@ -184,6 +240,12 @@ public class HttpClientTool {
                 url += "?" + EntityUtils.toString(new UrlEncodedFormEntity(pairs, charset));
             }
             HttpGet httpGet = new HttpGet(url);
+            Map<String, String> headers = AntiSpider.getHeaders();
+            httpGet.setHeader("User-Agent", headers.get("User-Agent"));
+            httpGet.setHeader("Accept", headers.get("Accept"));
+            httpGet.setHeader("Accept-Language", headers.get("Accept-Language"));
+            httpGet.setHeader("Connection", headers.get("Connection"));
+            httpGet.setHeader("Accept-Encoding", headers.get("Accept-Encoding"));
 
             // https  注意这里获取https内容，使用了忽略证书的方式，当然还有其他的方式来获取https内容
             CloseableHttpClient httpsClient = HttpClientTool.createSSLClientDefault();
@@ -212,6 +274,9 @@ public class HttpClientTool {
      * @return
      */
     public static CloseableHttpClient createSSLClientDefault() {
+        //获取配置对象
+        String ip_port = (String) redisTemplate.opsForSet().randomMember("proxy");
+        RequestConfig config = HttpClientTool.getRequestConfig(ip_port);
         try {
             SSLContext sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
                 // 信任所有
@@ -220,7 +285,8 @@ public class HttpClientTool {
                 }
             }).build();
             SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext);
-            return HttpClients.custom().setSSLSocketFactory(sslsf).build();
+            //返回HttpClient对象
+            return HttpClients.custom().setSSLSocketFactory(sslsf).setDefaultRequestConfig(config).build();
         } catch (KeyManagementException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
@@ -229,5 +295,35 @@ public class HttpClientTool {
             e.printStackTrace();
         }
         return HttpClients.createDefault();
+    }
+
+    /**
+     * 获取RequestConfig对象，配置HttpClient
+     * @param ip_port 从key为proxy的redis的set集合中随机取一个ip:port
+     * @return
+     */
+    public static RequestConfig getRequestConfig(String ip_port) {
+        RequestConfig config;
+        if (!StringUtils.isEmpty(ip_port)) {
+            String[] arr = ip_port.split(":");
+            String proxy_ip = arr[0];
+            int proxy_port = Integer.parseInt(arr[1]);
+            //创建代理类
+            HttpHost proxy = new HttpHost(proxy_ip,proxy_port);
+            config = RequestConfig.custom()
+                    .setProxy(proxy)
+                    .setConnectTimeout(60000)
+                    .setSocketTimeout(15000)
+                    .setConnectionRequestTimeout(6000)
+                    .build();
+        }else {
+            //如果没有从redis仓库获取到代理ip，就
+            config = RequestConfig.custom()
+                    .setConnectTimeout(60000)
+                    .setSocketTimeout(15000)
+                    .setConnectionRequestTimeout(6000)
+                    .build();
+        }
+        return config;
     }
 }

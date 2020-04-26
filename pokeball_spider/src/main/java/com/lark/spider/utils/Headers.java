@@ -3,6 +3,9 @@ package com.lark.spider.utils;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 获取头字段
+ */
 public class Headers {
     /**
      * user-agent数组

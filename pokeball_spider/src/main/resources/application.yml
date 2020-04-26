@@ -13,4 +13,10 @@ biliUrl:
     onlinePeopleURL: https://api.bilibili.com/x/web-interface/online #当前全网在线人数
     baseUserInfoURL: https://api.bilibili.com/x/space/acc/info?mid= #用户基本信息
     baseRelationURL: http://api.bilibili.com/x/relation/stat?vmid= #粉丝数、关注别人数
-    baseUpStatURL: https://api.bilibili.com/x/space/upstat?mid= #播放量、被点赞数
+    baseUpStatURL: http://api.bilibili.com/x/space/upstat?mid= #播放量、被点赞数
+  video:
+    videoTagURL: http://api.bilibili.com/x/tag/archive/tags?aid= #视频的标签
+    videoInfoURL: http://api.bilibili.com/x/web-interface/archive/stat?aid= #视频基本信息：AV号、BV号、弹幕数、评论数、收藏数、硬币数 、分享数、喜欢数、播放数
+  html:
+    videoRankURL: http://www.bilibili.com/ranking #每日视频排行榜，返回的是一个html
+

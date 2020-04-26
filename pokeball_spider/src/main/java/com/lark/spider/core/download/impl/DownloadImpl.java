@@ -33,6 +33,7 @@ public class DownloadImpl implements IDownload,Runnable {
 //        this.url = url;
 //    }
 
+
     /**
      * 下载url,
      * @param url
@@ -81,6 +82,18 @@ public class DownloadImpl implements IDownload,Runnable {
         JSONContentQueue.add(allJson);
 
         return allJson;
+    }
+
+    /**
+     * 下载html页面
+     * @param url
+     * @return
+     */
+    @Override
+    public String downloadHtml(String url) {
+        System.out.println("发起请求");
+        String result = HttpClientTool.doGet(url, null);
+        return result;
     }
 
     @Override
