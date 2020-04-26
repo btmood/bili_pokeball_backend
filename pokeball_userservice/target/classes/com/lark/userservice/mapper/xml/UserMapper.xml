@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lark.userservice.mapper.UserMapper">
+    
+    <resultMap id="selectOneUser" type="com.lark.usercommon.pojo.User">
+        <id column="id" property="id" />
+        <result column="mobile" property="mobile" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="enable_state" property="enableState" />
+        <result column="level" property="level" />
+        <result column="avatar" property="avatar" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="is_vip" property="isVip" />
+        <result column="info" property="info" />
+        <collection property="roles" ofType="com.lark.usercommon.pojo.Role">
+            <id column="prid" property="id" />
+            <result column="rolename" property="rolename" />
+            <result column="prdescription" property="description" />
+            <collection property="permissions" ofType="com.lark.usercommon.pojo.Permission">
+                <id column="pid" property="id" />
+                <result column="ptype" property="type" />
+                <result column="pname" property="name" />
+                <result column="pcode" property="code" />
+                <result column="ppid" property="pid" />
+                <result column="pdescription" property="description" />
+            </collection>
+        </collection>
+    </resultMap>
+    
+
+    <select id="selectOneUser" resultMap="selectOneUser">
+        select u.*,pr.id prid,pr.rolename rolename, pr.description prdescription,
+            p.id pid,p.type ptype,p.name pname,p.code pcode,p.pid ppid,p.description pdescription
+        from web_user u
+        inner join web_user_role ur on u.id = ur.user_id
+        inner join web_pe_role pr on ur.role_id = pr.id
+        inner join web_permission_role per on pr.id = per.role_id
+        inner join web_permission p on per.permission_id = p.id
+    </select>
+</mapper>

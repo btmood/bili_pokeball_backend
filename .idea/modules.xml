@@ -3,6 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/bili_pokeball.iml" filepath="$PROJECT_DIR$/.idea/bili_pokeball.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pokeball_spider/pokeball_spider.iml" filepath="$PROJECT_DIR$/pokeball_spider/pokeball_spider.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pokeball_userservice/pokeball_userservice.iml" filepath="$PROJECT_DIR$/pokeball_userservice/pokeball_userservice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/pokeball_webcommon/pokeball_webcommon.iml" filepath="$PROJECT_DIR$/pokeball_webcommon/pokeball_webcommon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/statservice/statservice.iml" filepath="$PROJECT_DIR$/statservice/statservice.iml" />
     </modules>
   </component>
 </project>

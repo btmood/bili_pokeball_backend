@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <Appenders>
+        <Console name="CONSOLE" target="SYSTEM_OUT">
+<!--            <PatternLayout charset="UTF-8" pattern="[%-5p] %d %c - %m%n" />-->
+            <PatternLayout
+                    pattern="[%style{%d}{bright,green}][%highlight{%p}][%style{%t}{bright,blue}][%style{%C}{bright,yellow}]: %msg%n%style{%throwable}{red}"
+                    disableAnsi="false" noConsoleNoAnsi="false"/>
+        </Console>
+
+        <RollingFile name="runtimeFile" fileName="./logs/statservice.log" filePattern="./logs/statservice-%d{yyyy-MM-dd}.log"
+                     append="true">
+<!--            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS Z}\t%level\t%class\t%line\t%thread\t%msg%n"/>-->
+            <PatternLayout>
+                <pattern>[%d][%p][%t][%C] %m%n</pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            <!-- 此行以下为自动清理日志的配置 -->
+            <DefaultRolloverStrategy>
+                <Delete basePath="./logs">
+                    <!-- glob 项为需要自动清理日志的pattern -->
+                    <IfFileName glob="*.log"/>
+                    <!-- 30d 表示自动清理掉30天以前的日志文件 -->
+                    <IfLastModified age="30d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+            <!-- 此行以上为自动清理日志的配置 -->
+        </RollingFile>
+
+        <!--<RollingFile name="accessLog" fileName="./logs/boot-launch-accessLog.log" filePattern="./logs/boot-launch-accessLog-%d{yyyy-MM-dd}.log"
+                     append="true">
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS Z}\t%level\t%class\t%line\t%thread\t%msg%n"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+            </Policies>
+            &lt;!&ndash; 此行以下为自动清理日志的配置 &ndash;&gt;
+            <DefaultRolloverStrategy>
+                <Delete basePath="./logs">
+                    &lt;!&ndash; glob 项为需要自动清理日志的pattern &ndash;&gt;
+                    <IfFileName glob="*.log"/>
+                    &lt;!&ndash; 30d 表示自动清理掉30天以前的日志文件 &ndash;&gt;
+                    <IfLastModified age="30d"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+            &lt;!&ndash; 此行以上为自动清理日志的配置 &ndash;&gt;
+        </RollingFile>-->
+
+
+    </Appenders>
+
+    <Loggers>
+        <!--<logger name="com.zimug.bootlaunch.config.accesslog.AccessLogInterceptor" level="info" additivity="false">
+            <AppenderRef ref="accessLog" />
+        </logger>-->
+        <root level="debug">
+            <AppenderRef ref="CONSOLE" />
+            <AppenderRef ref="runtimeFile" />
+        </root>
+    </Loggers>
+
+</configuration>

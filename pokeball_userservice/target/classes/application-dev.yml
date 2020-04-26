@@ -1,0 +1,38 @@
+server:
+  port: 8601
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/bili_pokeball?serverTimezone=GMT%2B8
+    username: root
+    password: 123456
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss # 时间格式
+    time-zone: GMT+8 # 时区
+  redis:
+    host: 47.100.28.132
+    port: 6379
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath*:/com/lark/userservice/mapper/xml/*.xml
+
+# 配置阿里云oss的固定值
+# 变量名都是自己随便起的
+aliyun:
+  oss:
+    file:
+      endpoint: oss-cn-shanghai.aliyuncs.com
+      keyid: LTAI4Ftv9Wj7UDAJaFJRJfo2
+      keysecret: N5TG2NiClHiihmqVNIuvtjsZvUo209
+      bucketname: edudemo111
+      host: avatar
+
+eureka: #指定注册中心地址
+  client:
+    service-url:
+      defaultZone: http://127.0.0.1:9002/eureka/
+  instance:
+    prefer-ip-address: true #eureka服务器上获取的是服务器的ip地址，否则是主机名
